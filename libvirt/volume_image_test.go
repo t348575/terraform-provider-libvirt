@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -119,7 +120,8 @@ func TestLocalImageDownload(t *testing.T) {
 	}
 
 	t.Logf("Importing %s", tmpfile.Name())
-	vol := newDefVolume()
+	currentUser, err := user.Current()
+	vol := newDefVolume(currentUser.Uid, currentUser.Gid)
 	vol.Target.Timestamps = &libvirtxml.StorageVolumeTargetTimestamps{
 		Mtime: fmt.Sprintf("%d.%d", tmpfileStat.ModTime().Unix(), tmpfileStat.ModTime().Nanosecond()),
 	}
@@ -164,7 +166,8 @@ func TestRemoteImageDownloadRetry(t *testing.T) {
 
 	server := newErrorServer([]int{503, 503})
 	defer server.Close()
-	vol := newDefVolume()
+	currentUser, err := user.Current()
+	vol := newDefVolume(currentUser.Uid, currentUser.Gid)
 	image, err := newImage(server.URL)
 	if err != nil {
 		t.Errorf("Could not create image object: %v", err)
@@ -179,7 +182,7 @@ func TestRemoteImageDownloadRetry(t *testing.T) {
 
 	server = newErrorServer([]int{503, 404})
 	defer server.Close()
-	vol = newDefVolume()
+	vol = newDefVolume(currentUser.Uid, currentUser.Gid)
 	start = time.Now()
 	image, err = newImage(server.URL)
 	if err != nil {
@@ -217,7 +220,8 @@ func TestRemoteImageDownload(t *testing.T) {
 	}
 
 	t.Logf("Importing %s", url)
-	vol := newDefVolume()
+	currentUser, err := user.Current()
+	vol := newDefVolume(currentUser.Uid, currentUser.Gid)
 	vol.Target.Timestamps = &libvirtxml.StorageVolumeTargetTimestamps{
 		Mtime: fmt.Sprintf("%d.%d", tmpfileStat.ModTime().Unix(), tmpfileStat.ModTime().Nanosecond()),
 	}
@@ -230,5 +234,3 @@ func TestRemoteImageDownload(t *testing.T) {
 	}
 	t.Log("File not copied because modification time was the same")
 }
-
-

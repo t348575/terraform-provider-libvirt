@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
+	"os/user"
 	"path/filepath"
 	"testing"
 
@@ -72,7 +73,8 @@ func testAccCheckLibvirtVolumeIsBackingStore(name string) resource.TestCheckFunc
 			return fmt.Errorf("Error retrieving libvirt volume XML description: %w", err)
 		}
 
-		volumeDef := newDefVolume()
+		currentUser, err := user.Current()
+		volumeDef := newDefVolume(currentUser.Uid, currentUser.Gid)
 		err = xml.Unmarshal([]byte(volXMLDesc), &volumeDef)
 		if err != nil {
 			return fmt.Errorf("Error reading libvirt volume XML description: %w", err)

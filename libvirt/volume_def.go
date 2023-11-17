@@ -8,14 +8,16 @@ import (
 	"libvirt.org/go/libvirtxml"
 )
 
-func newDefVolume() libvirtxml.StorageVolume {
+func newDefVolume(uid, gid string) libvirtxml.StorageVolume {
 	return libvirtxml.StorageVolume{
 		Target: &libvirtxml.StorageVolumeTarget{
 			Format: &libvirtxml.StorageVolumeTargetFormat{
 				Type: "qcow2",
 			},
 			Permissions: &libvirtxml.StorageVolumeTargetPermissions{
-				Mode: "644",
+				Mode:  "644",
+				Owner: uid,
+				Group: gid,
 			},
 		},
 		Capacity: &libvirtxml.StorageVolumeSize{

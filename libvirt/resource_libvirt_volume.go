@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os/user"
 
 	libvirt "github.com/digitalocean/go-libvirt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -113,7 +114,8 @@ func resourceLibvirtVolumeCreate(ctx context.Context, d *schema.ResourceData, me
 		return diag.FromErr(err)
 	}
 
-	volumeDef := newDefVolume()
+	currentUser, err := user.Current()
+	volumeDef := newDefVolume(currentUser.Uid, currentUser.Gid)
 	if name, ok := d.GetOk("name"); ok {
 		volumeDef.Name = name.(string)
 	}

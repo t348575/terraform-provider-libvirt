@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/user"
 	"strings"
 
 	libvirt "github.com/digitalocean/go-libvirt"
@@ -52,7 +53,8 @@ func (ign *defIgnition) CreateAndUpload(client *Client) (string, error) {
 		return "", err
 	}
 
-	volumeDef := newDefVolume()
+	currentUser, err := user.Current()
+	volumeDef := newDefVolume(currentUser.Uid, currentUser.Gid)
 	volumeDef.Name = ign.Name
 
 	ignFile, err := ign.createFile()

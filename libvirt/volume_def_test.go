@@ -3,6 +3,7 @@ package libvirt
 import (
 	"bytes"
 	"encoding/xml"
+	"os/user"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -59,7 +60,11 @@ func TestVolumeUnmarshal(t *testing.T) {
 }
 
 func TestDefaultVolumeMarshall(t *testing.T) {
-	b := newDefVolume()
+	currentUser, err := user.Current()
+	if err != nil {
+		t.Fatal("Could not get current user info")
+	}
+	b := newDefVolume(currentUser.Uid, currentUser.Gid)
 
 	buf := new(bytes.Buffer)
 	enc := xml.NewEncoder(buf)

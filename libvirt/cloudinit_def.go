@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"strings"
 
@@ -77,7 +78,8 @@ func (ci *defCloudInit) UploadIso(client *Client, iso string) (string, error) {
 		return "", err
 	}
 
-	volumeDef := newDefVolume()
+	currentUser, err := user.Current()
+	volumeDef := newDefVolume(currentUser.Uid, currentUser.Gid)
 	volumeDef.Name = ci.Name
 
 	// an existing image was given, this mean we can't choose size
